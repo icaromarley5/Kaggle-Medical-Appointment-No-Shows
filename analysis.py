@@ -464,9 +464,9 @@ feature selection
 '''
 # using dython module, from https://towardsdatascience.com/the-search-for-categorical-correlation-a1cf7f1888c9
 from dython.nominal import associations
-associations_results = associations(X_train[columns+[target]],nominal_columns=columns+[target],return_results=True,plot=False)
+associations_results = associations(X_train[columns+[target]],nominal_columns=columns+[target],plot=False)
 
-associations_results[target].sort_values()
+associations_results['corr'][target].sort_values()
 '''
 all features have weak or no association with the dependant variable
 discarding features with low association from Cramer's V (<0.05)
@@ -493,17 +493,17 @@ plt.show()
 # age_45_to_80
 sns.barplot(x='age_lesser_45',y=target,hue='age_45_to_80',data=X_train)
 plt.show()
-associations_results['age_45_to_80'].sort_values()
+associations_results['corr']['age_45_to_80'].sort_values()
 '''
 the adition of age_45_to_80 disturbs the association between age_lesser_45 and dependant variable
 discard feature
 '''
 columns.remove('age_45_to_80')
-associations_results = associations(X_train[columns+[target]],nominal_columns=columns+[target],return_results=True,plot=False)
+associations_results = associations(X_train[columns+[target]],nominal_columns=columns+[target],plot=False)
 # last_no_show
 sns.barplot(x='age_lesser_45',y=target,hue='last_no_show',data=X_train)
 plt.show()
-print(associations_results['last_no_show'].sort_values())
+print(associations_results['corr']['last_no_show'].sort_values())
 '''
 when last_no_show = 1, the rate of missed appointments is higher
 those features have no association
@@ -511,7 +511,7 @@ those features have no association
 # always_no_show
 sns.factorplot("last_no_show", target, hue='age_lesser_45',col="always_no_show", data=X_train, kind="bar")
 plt.show()
-associations_results['always_no_show'].sort_values()
+associations_results['corr']['always_no_show'].sort_values()
 '''
 always_no_show and last_no_show are strongly associated
 considering last_no_show, always_no_show almoest doesn't affect the target variable
@@ -519,22 +519,22 @@ discard feature
 '''
 columns.remove('always_no_show')
 
-associations_results = associations(X_train[columns+[target]],nominal_columns=columns+[target],return_results=True,plot=False)
+associations_results = associations(X_train[columns+[target]],nominal_columns=columns+[target],plot=False)
 # Hipertension
 sns.factorplot("last_no_show",target, hue='age_lesser_45',col='Hipertension', data=X_train, kind="bar")
 plt.show()
-associations_results['Hipertension'].sort_values()
+associations_results['corr']['Hipertension'].sort_values()
 '''
 hipertension disturbs the associations
 discard feature
 '''
 columns.remove('Hipertension')
 
-associations_results = associations(X_train[columns+[target]],nominal_columns=columns+[target],return_results=True,plot=False)
+associations_results = associations(X_train[columns+[target]],nominal_columns=columns+[target],plot=False)
 # days_lesser_10
 sns.factorplot("last_no_show",target, hue='age_lesser_45',col='days_lesser_10', data=X_train, kind="bar")
 plt.show()
-associations_results['days_lesser_10'].sort_values()
+associations_results['corr']['days_lesser_10'].sort_values()
 '''
 days_lesser_10 have no association with other features
 when days_lesser_10 = 1 the rate of missed appointments is lower
@@ -542,7 +542,7 @@ when days_lesser_10 = 1 the rate of missed appointments is lower
 # Scholarship
 sns.factorplot("last_no_show",target, hue='age_lesser_45',row='days_lesser_10',col='Scholarship', data=X_train, kind="bar")
 plt.show()
-associations_results['Scholarship'].sort_values()
+associations_results['corr']['Scholarship'].sort_values()
 '''
 government aid is weakly associated with age_lesser_45
 when days_lesser_10 =1 last_no_show = 1 scholarship=0, the rate of missed appointments are lower
@@ -609,6 +609,7 @@ plt.barh(range(X_train[columns].shape[1]), importances[indices],
 plt.yticks(range(X_train[columns].shape[1]), X_train[columns].columns[indices])
 plt.show()
 
+'''
 from sklearn.tree import export_graphviz
 from sklearn.externals.six import StringIO  
 from IPython.display import Image  
@@ -618,8 +619,9 @@ dot_data = StringIO()
 export_graphviz(model, out_file=dot_data,feature_names=columns, 
                 filled=True, rounded=True,class_names=['False','True'],
                 precision=2,proportion=True)
-graph = pydot.graph_from_dot_data(dot_data.getvalue())
+graph = pydot.graph_from_dot_data(dot_data.getvalue())[0]
 Image(graph.create_png())
+'''
 '''
 age_lesser_45 is the most important feature, last_no_show is the second 
 scholarship had almost no importance
@@ -702,12 +704,14 @@ plt.barh(range(X_all[columns].shape[1]), importances[indices],
 plt.yticks(range(X_all[columns].shape[1]), X_all[columns].columns[indices])
 plt.show()
 
+'''
 dot_data = StringIO()
 export_graphviz(model, out_file=dot_data,feature_names=columns, 
                 filled=True, rounded=True,class_names=['False','True'],
                 precision=2,proportion=True)
-graph = pydot.graph_from_dot_data(dot_data.getvalue())
+graph = pydot.graph_from_dot_data(dot_data.getvalue())[0]
 Image(graph.create_png())
+'''
 '''
 Similar tree and importances
 '''
